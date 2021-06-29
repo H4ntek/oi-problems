@@ -1,4 +1,5 @@
 //VI OI
+//Game theory / geometry
 #include <bits/stdc++.h>
 typedef long long int lli;
 using namespace std;
