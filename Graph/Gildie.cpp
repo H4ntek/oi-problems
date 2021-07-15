@@ -1,5 +1,4 @@
 //XVII OI
-//Bipartite graph
 #include <bits/stdc++.h>
 typedef long long int lli;
 using namespace std; 
