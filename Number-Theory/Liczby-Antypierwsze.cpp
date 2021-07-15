@@ -1,5 +1,4 @@
 //VIII OI
-//Number theory
 #include <bits/stdc++.h>
 typedef long long int lli;
 using namespace std;
