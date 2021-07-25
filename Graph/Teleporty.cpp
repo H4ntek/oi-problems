@@ -6,37 +6,19 @@ using namespace std;
 const int maxn = 4e4 + 3, INF = 1e9 + 3;
 
 vector <int> adj[maxn];
-int dist1[maxn], dist2[maxn];
+int dist[maxn][2];
 
-void BFS1(int v){
+void BFS(int v, int iter){
     queue <int> q;
     q.push(v);
-    dist1[v] = 0;
+    dist[v][iter] = 0;
     while (!q.empty()){
         v = q.front();
         q.pop();
         for (int child : adj[v]){
-            if (dist1[child] == INF){
-                dist1[child] = dist1[v] + 1;
-                if (dist1[child] < 2){
-                    q.push(child);
-                }
-            }
-        }
-    }
-}
-
-void BFS2(int v){
-    queue <int> q;
-    q.push(v);
-    dist2[v] = 0;
-    while (!q.empty()){
-        v = q.front();
-        q.pop();
-        for (int child : adj[v]){
-            if (dist2[child] == INF){
-                dist2[child] = dist2[v] + 1;
-                if (dist2[child] < 2){
+            if (dist[child][iter] == INF){
+                dist[child][iter] = dist[v][iter] + 1;
+                if (dist[child][iter] < 2){
                     q.push(child);
                 }
             }
@@ -53,23 +35,23 @@ void solve(){
         adj[b].push_back(a);
     }
     for (int i = 1; i <= n; i++){
-        dist1[i] = INF;
-        dist2[i] = INF;
+        dist[i][0] = INF;
+        dist[i][1] = INF;
     }
-    BFS1(1);
-    BFS2(2);
+    BFS(1, 0);
+    BFS(2, 1);
     int l1 = 0, l2 = 0, l3 = 0, l4 = 0;
     for (int i = 1; i <= n; i++){
-        if (dist1[i] == 1){
+        if (dist[i][0] == 1){
             l1++;
         }
-        else if (dist1[i] == 2){
+        else if (dist[i][0] == 2){
             l2++;
         }
-        if (dist2[i] == 1){
+        if (dist[i][1] == 1){
             l3++;
         }
-        if (dist2[i] == 2){
+        if (dist[i][1] == 2){
             l4++;
         }
     }
