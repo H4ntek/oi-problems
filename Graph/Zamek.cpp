@@ -5,36 +5,32 @@ using namespace std;
 
 const int maxn = 103, maxx = 1003;
 
-struct Node{
-    int no;
-    int mn;
-};
-
 vector <int> adj[maxn];
-bool vis2[maxn][maxx];
+bool vis[maxn][maxx];
 int cost[maxn], n, m, a, b, start, last, x;
-Node prv[maxn][maxx];
+pair <int, int> prv[maxn][maxx], nowy;
 
-void BFS(Node v){
-    queue <Node> q;
+//od tylu
+void BFS(pair <int, int> v){
+    queue <pair <int, int>> q;
     q.push(v);
     while (!q.empty()){
         v = q.front();
         q.pop();
-        vis2[v.no][v.mn] = true;
-        if (v.no == last && v.mn == 0){
+        int where = v.first, money = v.second;
+        if (where == start && money == x){
             return;
         }
-        Node n;
-        for (int child : adj[v.no]){
-            n.no = child;
-            n.mn = v.mn - cost[child];
-            if (n.mn < 0){
+        for (int child : adj[where]){
+            if (money + cost[child] > x){
                 continue;
             }
-            if (!vis2[child][n.mn]){
-                q.push(n);
-                prv[child][n.mn] = {v.no, v.mn};
+            if (!vis[child][money + cost[child]]){
+                nowy.first = child;
+                nowy.second = money + cost[child];
+                vis[child][money + cost[child]] = true;
+                prv[child][money + cost[child]] = {where, money};
+                q.push(nowy);
             }
         }
     }
@@ -50,24 +46,14 @@ void solve(){
         adj[a].push_back(b);
         adj[b].push_back(a);
     }
-    Node src = {start, x - cost[start]};
-    prv[start][x - cost[start]] = {-1, -1};
-    BFS(src);
 
-    vector <int> path;
-    Node temp = {last, 0};
-    path.push_back(temp.no);
-    temp = prv[last][0];
-    while (temp.no != -1){
-        path.push_back(temp.no);
-        temp = prv[temp.no][temp.mn];
-        if (temp.no == 0){
-            break;
-        }
-    }
-    reverse(path.begin(), path.end());
-    for (int v : path){
-        cout << v << " ";
+    BFS({last, cost[last]});
+
+    cout << start << " ";
+    pair <int, int> temp = prv[start][x];
+    while (temp.first != 0){
+        cout << temp.first << " ";
+        temp = prv[temp.first][temp.second];
     }
     cout << "\n";
 }
