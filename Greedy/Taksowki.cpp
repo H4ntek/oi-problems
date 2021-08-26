@@ -54,6 +54,9 @@ void solve(){
         i++;
         ans++;
     }
+    if (pos >= dest){
+        ans--;
+    }
     cout << ans << "\n";
 }
 
