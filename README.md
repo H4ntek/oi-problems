@@ -1,2 +1,2 @@
 # POI
-Solutions to various POI (Polish Olympiad in Informatics) problems.
+Solutions to POI (Polish Olympiad in Informatics) problems.
