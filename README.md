@@ -1,1 +1,1 @@
-zadania z OI-a / problems from OI
+Zadania z OI-a / problems from OI
