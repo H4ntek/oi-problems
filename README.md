@@ -1,2 +1,2 @@
-# POI
-Solutions to POI (Polish Olympiad in Informatics) problems.
+# oi-problems
+zadania z OI-a
