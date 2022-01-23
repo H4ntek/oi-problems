@@ -1,2 +1,1 @@
-# oi-problems
-zadania z OI-a
+zadania z OI-a / problems from OI
