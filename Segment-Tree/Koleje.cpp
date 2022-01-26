@@ -1,73 +1,123 @@
-//IX OI
 #include <bits/stdc++.h>
 typedef long long int lli;
 using namespace std;
 
-const int maxn = (1 << 16);
+/*
+CHANGE op AND neutral BEFORE USING
+OPTIONAL beggining array a (if there is one uncomment "build" function in init)
+Seg_tree st;
+st.init(n) - initializes a segment tree for array of size n
+st.query(1, 1, n, l, r) - returns query on [l, r]
+st.update(1, 1, n, l, r, v) - updates (adds or sets) v on [l, r]
+*/
+struct Seg_tree{
+    const int INF_INT = 1e9 + 3;
+    const lli INF_LL = 1e18 + 3;
+    int base;
+    vector <lli> st, lazy;
 
-lli st[2 * maxn], lazy[2 * maxn];
-lli cap;
+    lli op(lli a, lli b){ //max, min, sum, xor, gcd...
+        return max(a, b);
+    }
 
-void propagate(int me, int left, int right){
-	st[left] += lazy[me];
-	st[right] += lazy[me];
-	lazy[left] += lazy[me];
-	lazy[right] += lazy[me];
-	lazy[me] = 0;
-}
+    lli neutral(){ //0 for sum, xor, gcd, -INF for max, INF for min
+        return 0;
+    }
 
-lli query(int me, int ss, int se, int qs, int qe){ //finds max in [qs, qe]
-	if (ss > qe || se < qs){
-		return 0;
-	}
-	if (ss >= qs && se <= qe){
-		return st[me];
-	}
+    void build(int si, int ss, int se){
+        if (ss == se){
+            //st[si] = a[ss];
+            return;
+        }
+        int mid = (ss + se) / 2;
+        build(2 * si, ss, mid);
+        build(2 * si + 1, mid + 1, se);
+        st[si] = op(st[2 * si], st[2 * si + 1]);
+    }
 
-	int left = 2 * me, right = 2 * me + 1, mid = (ss + se) / 2;
-	propagate(me, left, right);
+    void init(int n){
+        base = 1;
+        while (base <= n){
+            base *= 2;
+        }
+        st.assign(2 * base, 0);
+        lazy.assign(2 * base, 0);
+        //build(1, 1, n);
+    }
 
-	lli ql = query(2 * me, ss, mid, qs, qe), qr = query(2 * me + 1, mid + 1, se, qs, qe);
-	return max(ql, qr);
-}
+    void propagate(int si, int ss, int se, lli val){ //for other queries / += for add updates, = for set updates
+        st[si] += val;
+        if (ss != se){
+            lazy[2 * si] += val;
+            lazy[2 * si + 1] += val;
+        }
+    }
 
-void update(int me, int ss, int se, int us, int ue, int val){ //add val to everything in [us, ue]
-	if (ss > ue || se < us){
-		return;
-	}
-	if (ss >= us && se <= ue){
-		st[me] += val;
-		lazy[me] += val;
-		return;
-	}
+    void propagate_sum(int si, int ss, int se, lli val){ //for sum queries / += for add updates, = for set updates
+        st[si] = val * (se - ss + 1);
+        if (ss != se){
+            lazy[2 * si] = val;
+            lazy[2 * si + 1] = val;
+        }
+    }
 
-	int left = 2 * me, right = 2 * me + 1, mid = (ss + se) / 2;
-	propagate(me, left, right);
+    lli query(int si, int ss, int se, int qs, int qe){ 
+        if (lazy[si] != 0){
+            propagate(si, ss, se, lazy[si]);
+            lazy[si] = 0;
+        }
 
-	update(left, ss, mid, us, ue, val);
-	update(right, mid + 1, se, us, ue, val);
+        if (ss > qe || se < qs){
+            return neutral();
+        }
+        if (ss >= qs && se <= qe){
+            return st[si];
+        }
 
-	st[me] = max(st[left], st[right]);
-}
+        int mid = (ss + se) / 2;
+        return op(query(2 * si, ss, mid, qs, qe), query(2 * si + 1, mid + 1, se, qs, qe));
+    }
+
+    void update(int si, int ss, int se, int us, int ue, lli val){ 
+        if (lazy[si] != 0){
+            propagate(si, ss, se, lazy[si]);
+            lazy[si] = 0;
+        }
+
+        if (ss > ue || se < us){
+            return;
+        }
+        if (ss >= us && se <= ue){
+            propagate(si, ss, se, val);
+            return;
+        }
+
+        int mid = (ss + se) / 2;
+        update(2 * si, ss, mid, us, ue, val);
+        update(2 * si + 1, mid + 1, se, us, ue, val);
+        st[si] = op(st[2 * si], st[2 * si + 1]);
+    }
+};
 
 void solve(){
-    int len, q, l, r;
-	lli res, n;
-	cin >> len >> cap >> q;
-	while (q--){
-		cin >> l >> r >> n;
-		res = query(1, 1, len, l, r - 1);
-		if (res + n <= cap){
-			cout << "T\n";
-			update(1, 1, len, l, r - 1, n);
-		}
-		else{
-			cout << "N\n";
-		}
-	}
+    int n, q, l, r, v, k;
+    cin >> n >> k >> q;
+    Seg_tree st;
+    st.init(n);
+    while (q--){
+        cin >> l >> r >> v;
+        l--, r--;
+        if (st.query(1, 0, n - 1, l, r - 1) + v <= k){
+            cout << "T\n";
+            st.update(1, 0, n - 1, l, r - 1, v);
+        }
+        else{
+            cout << "N\n";
+        }
+    }
 }
 
-int main (){
+int main(){
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
     int t;
