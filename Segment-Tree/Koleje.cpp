@@ -40,7 +40,7 @@ struct Seg_tree{
         while (base <= n){
             base *= 2;
         }
-        st.assign(2 * base, 0);
+        st.assign(2 * base, neutral());
         lazy.assign(2 * base, 0);
         //build(1, 1, n);
     }
