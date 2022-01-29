@@ -1,49 +1,50 @@
-//XVII OI
 #include <bits/stdc++.h>
 typedef long long int lli;
 using namespace std;
 
-const int maxn = 1e6 + 3;
+const int MAXN = 1e6 + 3;
 
-int a[maxn];
-vector <int> b[maxn], nr[maxn], temp;
+vector <int> occs[MAXN];
+
+bool check(const vector <int> &a){
+    int last_used = -1, where;
+    for (int x : a){
+        if (occs[x].empty()){
+            return false;
+        }
+        vector <int> :: iterator it = upper_bound(occs[x].begin(), occs[x].end(), last_used);
+        if (it - occs[x].begin() == (int) occs[x].size()){
+            return false;
+        }
+        where = *it;
+        if (where <= last_used){
+            return false;
+        }
+        last_used = where;
+    }
+    return true;
+}
 
 void solve(){
-    int n, m, k;
-    cin >> m;
-    for (int i = 0; i < m; i++){
-        cin >> a[i];
-    }
+    int n, x, q, m;
     cin >> n;
+    vector <int> a;
     for (int i = 0; i < n; i++){
-        cin >> k;
-        b[i] = vector <int> (k);
-        for (int j = k - 1; j >= 0; j--){
-            cin >> b[i][j];
-        }
-        nr[b[i].back() - 1].push_back(i);
+        cin >> x;
+        occs[x].push_back(i);
     }
-    for (int i = 0; i < m; i++){
-        temp.clear();
-        swap(temp, nr[a[i] - 1]);
-        for (int j = 0; j < temp.size(); j++){
-            b[temp[j]].pop_back();
-            if (!b[temp[j]].empty()){
-                nr[b[temp[j]].back() - 1].push_back(temp[j]);
-            }
+    cin >> q;
+    while (q--){
+        cin >> m;
+        a.resize(m);
+        for (int i = 0; i < m; i++){
+            cin >> a[i];
         }
-    }
-    for (int i = 0; i < n; i++){
-        if (b[i].empty()){
-            cout << "TAK\n";
-        }
-        else{
-            cout << "NIE\n";
-        }
+        cout << (check(a) ? "TAK\n" : "NIE\n");
     }
 }
 
-int main (){
+int main(){
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
     int t;
