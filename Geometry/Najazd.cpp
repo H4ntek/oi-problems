@@ -13,6 +13,9 @@ struct P{
     void print(){
         cout << "(" << x << ", " << y << ")\n";
     }
+    bool operator <(const P &a){ //
+        return x < a.x || (x == a.x && y < a.y);
+    }
     bool operator ==(const P &a){
         return x == a.x && y == a.y;
     }
@@ -22,9 +25,10 @@ struct P{
     lli operator *(const P& b) const{
         return x * b.y - y * b.x;
     }
-    //zwraca x, |x| = 2 * pole, x > 0 => b jest bardziej na prawo od c
+
+    //returns x, |x| = 2 * area of triangle, x > 0 <==> when going A->B->C we turn ccwise (+ve angle)
     lli orient(const P& b, const P& c) const { 
-        return (c - *this) * (b - *this);
+        return (b - *this) * (c - *this);
     }
 };
 
@@ -51,7 +55,7 @@ void solve(){
             l = j + 1, r = j + n - 1;
             while (l < r){
                 mid = (l + r) / 2;
-                if (poly[j].orient(poly[mid % n], fab) >= 0){
+                if (poly[j].orient(poly[mid % n], fab) <= 0){
                     l = mid + 1;
                 }
                 else{
