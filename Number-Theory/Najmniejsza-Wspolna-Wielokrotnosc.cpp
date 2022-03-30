@@ -2,43 +2,44 @@
 typedef long long int lli;
 using namespace std;
 
-const int INF = 1e9 + 3;
+#define ff first
+#define ss second
 
-const lli ending_values[4] = {2000000, 70000, 10000, 3000};
+const lli MAX_VALS[4] = {2000000, 70000, 10000, 3000};
+
+vector <pair <lli, pair <int, int>>> LCM_tab; 
 
 lli special_case(lli n){
-    lli m = 4*n + 1;
-    lli root = sqrt(m);
+    lli delta = 4*n + 1;
+    lli root = sqrt(delta);
     for (lli i = root - 8; i <= root + 8; i++){
-        if (i * i == m){
-            if (i % 2 == 1){
-                return (i - 1) / 2;
-            }
+        if (i * i == delta && i % 2 == 1){
+            return (i - 1) / 2;
         }
     }
-    return 0;
+    return -1;
 }
 
 lli __lcm(lli a, lli b){
     return (a / __gcd(a, b)) * b;
 }
 
-lli LCM(int first, int last){
+lli LCM(int a, int b){
     lli res = 1;
-    for (int i = first; i <= last; i++){
+    for (int i = a; i <= b; i++){
         res = __lcm(res, i);
     }
     return res;
 }
 
-int b_search(const vector <pair <lli, pair <int, int>>> &a, lli n){
-    int l = 0, r = a.size(), mid, ans = -1;
+int b_search(lli n){
+    int l = 0, r = LCM_tab.size(), mid, ans = -1;
     while (l <= r){
         mid = (l + r) / 2;
-        if (a[mid].first < n){
+        if (LCM_tab[mid].ff < n){
             l = mid + 1;
         }
-        else if (a[mid].first == n){
+        else if (LCM_tab[mid].ff == n){
             ans = mid;
             r = mid - 1;
         }
@@ -49,48 +50,37 @@ int b_search(const vector <pair <lli, pair <int, int>>> &a, lli n){
     return ans;
 }
 
-void solve(){
-    int q, where, ans_start, ans_end;
-    lli n, temp;
-    bool found;
-    vector <pair <lli, pair <int, int>>> answers; /* {LCM, {start, start + len - 1}} */
+void preprocess(){
     for (int k = 3; k <= 100; k++){
-        for (int start = 1; start <= ending_values[min(3, k - 3)]; start++){
-            answers.emplace_back(LCM(start, start + k - 1), make_pair(start, start + k - 1));
+        for (int start = 1; start <= MAX_VALS[min(3, k - 3)]; start++){
+            LCM_tab.emplace_back(LCM(start, start + k - 1), make_pair(start, start + k - 1));
         }
     }
-    sort(answers.begin(), answers.end());
+    sort(LCM_tab.begin(), LCM_tab.end());
+}
 
-    cin >> q;
-    while (q--){
-        found = false;
-        ans_start = ans_end = INF;
-        cin >> n;
-        //special case
-        temp = special_case(n);
-        if (temp){
-            found = true;
-            ans_start = temp;
-            ans_end = temp + 1;
-        }
-        
-        //b. search the answer
-        where = b_search(answers, n);
-        if (where == -1){
-            if (found){
-                cout << ans_start << " " << ans_end << "\n";
-            }
-            else{
-                cout << "NIE\n";
-            }
+void solve(){
+    int where;
+    lli n, a;
+    
+    cin >> n;
+    a = special_case(n);
+    where = b_search(n);
+    
+    if (where == -1){
+        if (a != -1){
+            cout << a << " " << a + 1 << "\n";
         }
         else{
-            if (answers[where].second.first < ans_start){
-                cout << answers[where].second.first << " " << answers[where].second.second << "\n";
-            }
-            else{
-                cout << ans_start << " " << ans_end << "\n";
-            }
+            cout << "NIE\n";
+        }
+    }
+    else{
+        if (a <= LCM_tab[where].ss.ff && a != -1){
+            cout << a << " " << a + 1 << "\n";
+        }
+        else{
+            cout << LCM_tab[where].ss.ff << " " << LCM_tab[where].ss.ss << "\n";
         }
     }
 }
@@ -98,9 +88,10 @@ void solve(){
 int main(){
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
+    preprocess();
     int t;
-    //cin >> t;
-    t = 1;
+    cin >> t;
+    //t = 1;
     while (t--){
         solve();
     }
