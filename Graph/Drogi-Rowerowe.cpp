@@ -6,68 +6,33 @@ const int MAXN = 5e4 + 3;
 
 vector <int> adj[MAXN], adj_t[MAXN], adj_cc[MAXN];
 int comp[MAXN], comp_sz[MAXN], dp[MAXN];
-bool vis_cc[MAXN];
+bool vis[MAXN], vis_cc[MAXN];
 
-struct SCC{
-    int n, comp_no = 0;
-    vector <int> preorder, component;
-    vector <bool> vis;
+int cc_no = 0;
+vector <int> postorder;
 
-    void init(int n_){
-        n = n_;
-        preorder.clear();
-        component.clear();
-    }
-
-    void DFS1(int v){
-        vis[v] = true;
-        for (int child : adj[v]){
-            if (!vis[child]){
-                DFS1(child);
-            }
-        }
-        preorder.push_back(v);
-    }
-
-    void DFS2(int v){
-        vis[v] = true;
-        comp[v] = comp_no;
-        comp_sz[comp_no]++;
-        component.push_back(v);
-        for (int child : adj_t[v]){
-            if (!vis[child]){
-                DFS2(child);
-            }
-            else{
-                if (adj_cc[comp[child]].empty() || adj_cc[comp[child]].back() != comp_no){
-                    if (comp[child] != comp_no){
-                        adj_cc[comp[child]].push_back(comp_no);
-                    }
-                }
-            }
+void DFS_postorder(int v){
+    vis[v] = true;
+    for (int child : adj[v]){
+        if (!vis[child]){
+            DFS_postorder(child);
         }
     }
+    postorder.push_back(v);
+}
 
-    vector <vector <int>> run(){
-        vector <vector <int>> components;
-        vis.assign(n + 1, false);
-        for (int i = 1; i <= n; i++){
-            if (!vis[i]){
-                DFS1(i);
-            }
+void DFS_trans(int v){ 
+    comp[v] = cc_no;
+    comp_sz[cc_no]++;
+    for (int child : adj_t[v]){
+        if (comp[child] == 0){
+            DFS_trans(child);
         }
-        vis.assign(n + 1, false);
-        for (int i = n - 1; i >= 0; i--){
-            if (!vis[preorder[i]]){
-                comp_no++;
-                DFS2(preorder[i]);
-                components.push_back(component);
-                component.clear();
-            }
+        else if (comp[child] != cc_no){
+            adj_cc[comp[child]].push_back(cc_no);
         }
-        return components;
     }
-};
+}
 
 void DFS_dp(int v, int par){
     vis_cc[v] = true;
@@ -88,9 +53,20 @@ void solve(){
         adj[a].push_back(b);
         adj_t[b].push_back(a);
     }
-    SCC scc;
-    scc.init(n);
-    vector <vector <int>> sccs = scc.run();
+    
+    for (int i = 1; i <= n; i++){
+        if (!vis[i]){
+            DFS_postorder(i);
+        }
+    }
+    reverse(postorder.begin(), postorder.end());
+    for (int i = 0; i < n; i++){
+        if (comp[postorder[i]] == 0){
+            cc_no++;
+            DFS_trans(postorder[i]);
+        }
+    }
+    
     for (int i = 1; i <= n; i++){
         if (!vis_cc[i]){
             DFS_dp(i, -1);
