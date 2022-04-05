@@ -2,52 +2,50 @@
 typedef long long int lli;
 using namespace std;
 
-//1-5000 przed granica, 5001-10005 - za granica
-const int maxn = 5000;
-const lli INF = 1e17 +3;
+#define ff first
+#define ss second
 
-lli price[2 * maxn + 3];
-lli dist[2 * maxn + 3];
-vector <int> adj[2 * maxn + 3];
-map <pair <int, lli>, int> wgt;
-priority_queue <int> pq;
+const int MAXN = 1e5 + 3;
+const lli INF = 1e18 + 3;
+
+lli dist[2 * MAXN + 7];
+vector <pair <int, lli>> adj[2 * MAXN + 7];
+
+void Dijkstra(int v){
+    priority_queue <pair <lli, int>> pq;
+    pq.push({0, v});
+    dist[v] = 0;
+    int so_far;
+    while (!pq.empty()){
+        v = pq.top().ss;
+        so_far = -pq.top().ff;
+        pq.pop();
+        for (auto p : adj[v]){
+            if (dist[p.ff] > so_far + p.ss){
+                pq.push({-(so_far + p.ss), p.ff});
+                dist[p.ff] = so_far + p.ss;
+            }
+        }
+    }
+}
 
 void solve(){
-    int n, m, a, b, w, cur, new_w;
+	int n, m, a, b, w, price;
     cin >> n;
     for (int i = 1; i <= n; i++){
-        cin >> price[i];
+        cin >> price;
+        adj[i].emplace_back(i + MAXN, price / 2);
+        dist[i] = INF;
+        dist[i + MAXN] = INF;
     }
     cin >> m;
     for (int i = 0; i < m; i++){
         cin >> a >> b >> w;
-        adj[a].push_back(b);
-        adj[a + maxn].push_back(b + maxn);
-        wgt[{a, b}] = w;
-        wgt[{a + maxn, b + maxn}] = w;
-        dist[a] = INF, dist[b] = INF;
-        dist[a + maxn] = INF, dist[b + maxn] = INF;
+        adj[a].emplace_back(b, w);
+        adj[a + MAXN].emplace_back(b + MAXN, w);
     }
-    for (int i = 1; i <= n; i++){
-        adj[i].push_back(i + maxn);
-        wgt[{i, i + maxn}] = price[i] / 2;
-    }
-
-    dist[1] = 0;
-    pq.push(1);
-
-    while(!pq.empty()){
-        cur = pq.top();
-        pq.pop();
-        for (int child : adj[cur]){
-            new_w = wgt[{cur, child}];
-            if (dist[cur] + new_w < dist[child]){
-                dist[child] = dist[cur] + new_w;
-                pq.push(child);
-            }
-        }
-    }
-    cout << (dist[1 + maxn] != 0 ? dist[1 + maxn] : 50000000) << "\n";
+    Dijkstra(1);
+    cout << dist[1 + MAXN] << "\n";
 }
 
 int main(){
