@@ -31,11 +31,11 @@ void DFS_find_centroid(int v, int par, int total_sz){
             DFS_find_centroid(child.ff, v, total_sz);
             mx = max(mx, sub_size[child.ff] + 1);
         }
+    }
 
-        if (mx < cur_max){
-            centroid = v;
-            cur_max = mx;
-        }
+    if (mx < cur_max){
+        centroid = v;
+        cur_max = mx;
     }
 }
 
@@ -103,9 +103,10 @@ void DFS_main(int v){
         }
     }
     
+    int local_centroid = centroid;
     vis[centroid] = true; 
 
-    for (auto child : adj[centroid]){
+    for (auto child : adj[local_centroid]){
         if (!vis[child.ff]){
             DFS_main(child.ff);
         }
