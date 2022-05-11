@@ -102,7 +102,7 @@ void solve(){
     for (int i = 1; i < LOG; i++){
         for (int v = 1; v <= n; v++){
             jump[v][i] = jump[jump[v][i - 1]][i - 1];
-            jump_max[v][i] = max(jump_max[v][i], jump_max[jump[v][i - 1]][i - 1]);
+            jump_max[v][i] = max(jump_max[v][i - 1], jump_max[jump[v][i - 1]][i - 1]);
         }
     }
 
